@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import moment from "moment";
 import _ from "lodash";
+import { GetService } from "../../helpers/urls";
+
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const dates = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -11,6 +13,8 @@ class Home extends Component {
     this.state = {
       manipulator: 0,
     }
+    this.getService = new GetService();
+
   }
 
   componentDidMount() {
@@ -21,59 +25,15 @@ class Home extends Component {
       selectedMonth: month,
       selectedYear: year
     })
-    this.getDaysInMonth(month, year)
+    this.getCalender(month, year);
   }
 
-  getDaysInMonth = (month, year) => {
-    let date = new Date(year, month, 1);
-    alert(date);
-    let allDays = [];
-    while (date.getMonth() === month) {
-      allDays.push({
-        date: moment(date).format("DD"),
-        day: moment(date).format("ddd")
-      });
-      date.setDate(date.getDate() + 1);
-    }
-    this.setState({ allDays: allDays });
-    // alert(JSON.stringify(allDays));
-    this._formatdate(allDays)
-  }
-
-  _formatdate = (allDays) => {
-    let calenderData = [];
-    let calenderObj = {
-      sun: '',
-      mon: '',
-      tue: '',
-      wed: '',
-      thu: '',
-      fri: '',
-      sat: ''
-    };
-    const d = new Date();
-    const sday = d.getDay();
-    _.forEach(allDays, (allday) => {
-      calenderObj[`${allday.day.toLowerCase()}`] = allday.date;
-      if (allday.day.toLowerCase() === 'sat') {
-        calenderData.push(calenderObj);
-        calenderObj = {
-          sun: '',
-          mon: '',
-          tue: '',
-          wed: '',
-          thu: '',
-          fri: '',
-          sat: ''
-
-        };
-      }
-
-    })
-    calenderData.push(calenderObj);
-
-    this.setState({ calenderData: calenderData });
-
+  getCalender = (month, year) => {
+    this.getService
+      .getCalender(month, year)
+      .then(response => {
+        this.setState({ calenderData: response.data });
+      })
   }
 
   prev = () => {
@@ -88,7 +48,7 @@ class Home extends Component {
       selectedMonth: month,
       selectedYear: year
     })
-    this.getDaysInMonth(month, year);
+    this.getCalender(month, year);
 
   }
 
@@ -104,7 +64,7 @@ class Home extends Component {
       selectedMonth: month,
       selectedYear: year
     })
-    this.getDaysInMonth(month, year);
+    this.getCalender(month, year);
   }
 
   render() {

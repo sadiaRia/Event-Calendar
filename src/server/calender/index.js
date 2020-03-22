@@ -3,7 +3,7 @@ const moment = require("moment"),
 
 function getCalender(req, res) {
   let year = req.query.year;
-  let month = parseInt(req.query.month - 1);
+  let month = parseInt(req.query.month);
   let date = new Date(year, month, 1);
   console.log(date);
   let allDays = [];
