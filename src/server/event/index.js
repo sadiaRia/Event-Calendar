@@ -1,4 +1,7 @@
-const Event = require('./event');
+const Event = require('./event'),
+ moment = require("moment"),
+  _ = require('lodash');
+
 
 function create(req, res) {
   Event.create(req.body, (err, createdEvent) => {
@@ -30,12 +33,12 @@ function list(req, res) {
       {
         _id: '$eventDate',
         eventCount: { $sum: 1 },
-        evetList: { $push: '$_id' }
+        eventList: { $push: '$_id' }
       }
     }
   ], (err, result) => {
     if (err) { return res.status(400).send(err); }
-    Event.populate(result, { path: 'evetList' }, (err, populatedEventList) => {
+    Event.populate(result, { path: 'eventList' }, (err, populatedEventList) => {
       if (err) { return res.status(400).send(err); }
       return res.status(200).send(populatedEventList);
     });
