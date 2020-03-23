@@ -10,16 +10,20 @@ export class GetService {
     return axios.get(this.getHost() + `getCalender?month=${month}&year=${year}`)
   }
 
-  createEvent(payload){
-    return axios.post(this.getHost() + `events`,payload)
+  createEvent(payload) {
+    return axios.post(this.getHost() + `events`, payload)
   }
 
-  getAllEvents(){
+  getAllEvents() {
     return axios.get(this.getHost() + `events`)
-   }
-
-   updateEvents(payload,id){
-    return axios.put(this.getHost() + `events/${id}`,payload)
-   }
-
   }
+
+  updateEvents(payload, id) {
+    return axios.put(this.getHost() + `events/${id}`, payload)
+  }
+
+  removeEvent(id) {
+    return axios.delete(this.getHost() + `events/${id}`)
+  }
+
+}

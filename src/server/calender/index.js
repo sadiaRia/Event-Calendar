@@ -5,7 +5,6 @@ function getCalender(req, res) {
   let year = req.query.year;
   let month = parseInt(req.query.month);
   let date = new Date(year, month, 1);
-  console.log(date);
   let allDays = [];
   while (date.getMonth().toString() === month.toString()) {
     allDays.push({

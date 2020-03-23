@@ -118,10 +118,10 @@ class Home extends Component {
     }
   }
 
-  resetEverything = () =>{
+  resetEverything = () => {
     this.hideForm();
     this.getAllevents();
-}
+  }
 
   getAllevents = () => {
     this.getService.getAllEvents()
@@ -165,6 +165,14 @@ class Home extends Component {
     })
   }
 
+  removeEvent = () => {
+    const eventId = this.state.selectedEventId;
+    this.getService.removeEvent(eventId)
+      .then(response => {
+        this.resetEverything();
+      })
+  }
+
   renderEvents(data) {
     const list = this._getEvent(data);
     return (list.map((val, index) =>
@@ -174,7 +182,7 @@ class Home extends Component {
 
 
   render() {
-    const { calenderData, selectedMonth, selectedYear, title, type, description, selectedEventDate, showCalender, showForm } = this.state;
+    const { calenderData, selectedMonth, selectedYear, title, type, description, selectedEventDate, showCalender, showForm, selectedEventId } = this.state;
     return (
       <div class="container">
         {showCalender && <div>
@@ -251,7 +259,9 @@ class Home extends Component {
           </div>
           <div>
             <button onClick={() => this.createEvent()} type="button" class="btn btn-success">Submit</button>&nbsp;&nbsp;
-          <button onClick={() => this.hideForm()} type="button" class="btn btn-warning">Cancel</button>
+          <button onClick={() => this.hideForm()} type="button" class="btn btn-warning">Cancel</button>nbsp;&nbsp
+           {selectedEventId && <button type="button" onClick={() => this.removeEvent()} class="btn btn-danger">Danger</button>}
+
           </div>
         </form>}
 
