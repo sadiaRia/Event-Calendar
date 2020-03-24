@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import moment from "moment";
 import _ from "lodash";
+import socketIOClient from 'socket.io-client';
 import { GetService } from "../../helpers/urls";
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -34,6 +35,10 @@ class Home extends Component {
     })
     this.getCalender(month, year);
     this.getAllevents(month, year);
+    const socket = socketIOClient(this.getService.getHost());
+    socket.on("new:Event", (data) => {
+      this.setState({ allEventList: data })
+    });
   }
 
   getToday = (m, y) => {
@@ -193,24 +198,24 @@ class Home extends Component {
   render() {
     const { calenderData, selectedMonth, selectedYear, title, type, description, selectedEventDate, showCalender, showForm, selectedEventId, today } = this.state;
     return (
-      <div class="container">
+      <div className="container">
         <br />
         {showCalender && <div>
           <div style={{ background: '#001a66', color: 'white' }}>
-            <ul class="nav justify-content-center">
-              <li class="nav-item">
+            <ul className="nav justify-content-center">
+              <li className="nav-item">
                 <a href='#' onClick={() => this.prev()} style={{ fontSize: '26px', color: 'white' }}> {` < `}</a>&nbsp;&nbsp;
            </li>
-              <li class="nav-item">
+              <li className="nav-item">
                 <h1 style={{ textAlign: 'center' }}>{months[selectedMonth]} {selectedYear}</h1>
               </li>&nbsp;&nbsp;&nbsp;
-          <li class="nav-item">
+          <li className="nav-item">
                 <a href='#' onClick={() => this.next()} style={{ fontSize: '26px', color: 'white' }}> {` > `}</a>
               </li>
             </ul>
           </div>
           <div>
-            <table class="table table-bordered">
+            <table className="table table-bordered">
               <thead>
                 <tr>
                   {days.map((day) =>
@@ -259,18 +264,18 @@ class Home extends Component {
           </div>
         </div>}
         {showForm && <form>
-          <div class="form-group">
+          <div className="form-group">
             <label for="exampleFormControlInput1">Selectetd Date</label>
-            <input disabled={true} type="text" value={selectedEventDate || ''} class="form-control" id="exampleFormControlInput1" />
+            <input disabled={true} type="text" value={selectedEventDate || ''} className="form-control" id="exampleFormControlInput1" />
           </div>
 
-          <div class="form-group">
+          <div classNames="form-group">
             <label for="exampleFormControlInput1">Title</label>
-            <input type="text" name="title" value={title || ''} class="form-control" id="exampleFormControlInput1" placeholder="Enter Title" onChange={this.setStateOnFieldChange} />
+            <input type="text" name="title" value={title || ''} className="form-control" id="exampleFormControlInput1" placeholder="Enter Title" onChange={this.setStateOnFieldChange} />
           </div>
-          <div class="form-group">
+          <div className="form-group">
             <label for="exampleFormControlSelect1">Type</label>
-            <select class="form-control" name="type" value={type || ''} id="exampleFormControlSelect1" onChange={this.setStateOnFieldChange}>
+            <select className="form-control" name="type" value={type || ''} id="exampleFormControlSelect1" onChange={this.setStateOnFieldChange}>
               <option value="">Please Select</option>
 
               <option value="Meeting">Meeting</option>
@@ -280,14 +285,14 @@ class Home extends Component {
               <option value="others">Others</option>
             </select>
           </div>
-          <div class="form-group">
+          <div className="form-group">
             <label for="exampleFormControlTextarea1">Description</label>
-            <textarea name="description" value={description || ''} class="form-control" id="exampleFormControlTextarea1" rows="3" onChange={this.setStateOnFieldChange}></textarea>
+            <textarea name="description" value={description || ''} className="form-control" id="exampleFormControlTextarea1" rows="3" onChange={this.setStateOnFieldChange}></textarea>
           </div>
           <div>
-            <button onClick={() => this.createEvent()} type="button" class="btn btn-success">Submit</button>&nbsp;&nbsp;
-          <button onClick={() => this.hideForm()} type="button" class="btn btn-warning">Cancel</button>&nbsp;&nbsp;
-           {selectedEventId && <button type="button" onClick={() => this.removeEvent()} class="btn btn-danger">Delete</button>}
+            <button onClick={() => this.createEvent()} type="button" className="btn btn-success">Submit</button>&nbsp;&nbsp;
+          <button onClick={() => this.hideForm()} type="button" className="btn btn-warning">Cancel</button>&nbsp;&nbsp;
+           {selectedEventId && <button type="button" onClick={() => this.removeEvent()} className="btn btn-danger">Delete</button>}
 
           </div>
         </form>}

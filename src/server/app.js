@@ -5,7 +5,10 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const dbConfig = require('../../db');
 const fs = require('fs');
+const socketIO = require('socket.io');
+const async = require('async');
 const router = express.Router();
+const axios = require('axios');
 const cors = require('cors');
 require('./model');
 
@@ -33,6 +36,17 @@ app.get('/', (req, res) => {
 
 app.use(express.static(publicPath));
 
-app.listen(3000, () => {
+const server = app.listen(3000, () => {
   console.log("MERN Boilerplate listening on port 3000!");
+});
+
+//socket connection
+const io = socketIO(server);
+io.on("connection", socket => {
+  console.log("New client connected");
+  const sockets = require('./event/index');
+  sockets.useSocket(socket);
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+  });
 });

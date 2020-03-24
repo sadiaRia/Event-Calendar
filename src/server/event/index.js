@@ -2,11 +2,17 @@ const Event = require('./event'),
   moment = require("moment"),
   _ = require('lodash');
 
+let io;
+function useSocket(socket) {
+  io = socket;
+}
+
 
 function create(req, res) {
   Event.create(req.body, (err, createdEvent) => {
     if (err) { return res.status(400).send('Failed to create new Event.'); }
-    res.status(200).send(createdEvent);
+    _alleventList({}, () => { })
+    return res.status(200).send(createdEvent);
   });
 }
 
@@ -24,18 +30,7 @@ function update(req, res) {
   })
 }
 
-function list(req, res) {
-  let query = {};
-  const year = req.query.year,
-    month = req.query.month,
-    startDate = moment([year, month]).toISOString(),
-    endDate = moment(startDate).endOf('month').toISOString();
-  query = { // query for getting particular month eventList
-    eventDate: {
-      $gt: new Date(startDate),
-      $lte: new Date(endDate)
-    }
-  };
+function _alleventList(query, callback) {
   Event.aggregate([
     { $match: query },
     {
@@ -47,12 +42,31 @@ function list(req, res) {
       }
     }
   ], (err, result) => {
-    if (err) { return res.status(400).send(err); }
+    if (err) { return callback(new Error('Error')); }
     Event.populate(result, { path: 'eventList' }, (err, populatedEventList) => {
-      if (err) { return res.status(400).send(err); }
-      return res.status(200).send(populatedEventList);
+      if (err) { return callback(new Error('Error')); }
+      io.emit('new:Event', populatedEventList);
+      return callback(null, populatedEventList);
     });
   });
+}
+
+
+function list(req, res) {
+  const year = req.query.year,
+    month = req.query.month,
+    startDate = moment([year, month]).toISOString(),
+    endDate = moment(startDate).endOf('month').toISOString();
+  let query = (year && month) ? { // query for getting particular month eventList
+    eventDate: {
+      $gte: new Date(startDate),
+      $lte: new Date(endDate)
+    }
+  } : {};
+  _alleventList(query, (err, eventList) => {
+    if (err) { return res.status(400).send(err); }
+    return res.status(200).send(eventList);
+  })
 }
 
 function remove(req, res) {
@@ -72,5 +86,6 @@ module.exports = {
   create,
   update,
   list,
-  remove
+  remove,
+  useSocket
 }
