@@ -4,7 +4,6 @@ import moment from "moment";
 import _ from "lodash";
 import { GetService } from "../../helpers/urls";
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const dates = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 class Home extends Component {
@@ -22,7 +21,6 @@ class Home extends Component {
       selectedEventId: ''
     }
     this.getService = new GetService();
-
   }
 
   componentDidMount() {
@@ -31,10 +29,19 @@ class Home extends Component {
     const year = date.getFullYear();
     this.setState({
       selectedMonth: month,
-      selectedYear: year
+      selectedYear: year,
+      today: moment(date).format("DD")
     })
     this.getCalender(month, year);
     this.getAllevents(month, year);
+  }
+
+  getToday = (m, y) => {
+    const date = new Date();
+    const month = date.getMonth();
+    const year = date.getFullYear();
+    const today = y === year && m === month ? moment(date).format("DD") : ''
+    this.setState({ today })
   }
 
   setStateOnFieldChange = (event) => {
@@ -65,6 +72,7 @@ class Home extends Component {
     })
     this.getCalender(month, year);
     this.getAllevents(month, year);
+    this.getToday(month, year);
   }
 
   next = () => {
@@ -81,6 +89,7 @@ class Home extends Component {
     })
     this.getCalender(month, year);
     this.getAllevents(month, year);
+    this.getToday(month, year);
   }
 
   addEvent = (date) => {
@@ -149,7 +158,6 @@ class Home extends Component {
     let d = new Date(year, month, date);
     const eventDate = moment(d).toISOString();
     let index = _.findIndex(this.state.allEventList, { '_id': eventDate })
-    console.log(index !== -1 ? this.state.allEventList[index].eventList : null)
     return index !== -1 ? this.state.allEventList[index].eventList : null;
   }
 
@@ -177,16 +185,16 @@ class Home extends Component {
   renderEvents(data) {
     const list = this._getEvent(data);
     return (list.map((val, index) =>
-      <div style={{textAlign: 'center' }}><a href='#' onClick={() => this.updateEvent(list, index)}>{val.title}</a></div>
+      <div style={{ textAlign: 'center' }}><a href='#' onClick={() => this.updateEvent(list, index)}>{val.title}</a></div>
     ))
   }
 
 
   render() {
-    const { calenderData, selectedMonth, selectedYear, title, type, description, selectedEventDate, showCalender, showForm, selectedEventId } = this.state;
+    const { calenderData, selectedMonth, selectedYear, title, type, description, selectedEventDate, showCalender, showForm, selectedEventId, today } = this.state;
     return (
       <div class="container">
-        <br/>
+        <br />
         {showCalender && <div>
           <div style={{ background: '#001a66', color: 'white' }}>
             <ul class="nav justify-content-center">
@@ -215,34 +223,32 @@ class Home extends Component {
 
                   <tr style={{ height: '200px' }}>
                     <td style={{ textAlign: 'center', width: '100px' }} >
-                      {data.sun && <a style={{ color: 'black' }} href='#' onClick={() => this.addEvent(data.sun)}>{data.sun}</a>}
+                      {data.sun && <a style={data.sun === today ? { background: '#AED6F1', color: 'black' } : { color: 'black' }} href='#' onClick={() => this.addEvent(data.sun)}>{data.sun}</a>}
                       {this._getEvent(data.sun) !== null && this.renderEvents(data.sun)}
                     </td>
                     <td style={{ textAlign: 'center', width: '100px' }} >
-                      {data.mon && <a style={{ color: 'black' }} href='#' onClick={() => this.addEvent(data.mon)}>{data.mon}</a>}
+                      {data.mon && <a style={data.mon === today ? { background: '#AED6F1', color: 'black' } : { color: 'black' }} href='#' onClick={() => this.addEvent(data.mon)}>{data.mon}</a>}
                       {this._getEvent(data.mon) !== null && this.renderEvents(data.mon)}
                     </td>
                     <td style={{ textAlign: 'center', width: '100px' }} >
-                      {data.tue && <a style={{ color: 'black' }} href='#' onClick={() => this.addEvent(data.tue)}>{data.tue}</a>}
+                      {data.tue && <a style={data.tue === today ? { background: '#AED6F1', color: 'black' } : { color: 'black' }} href='#' onClick={() => this.addEvent(data.tue)}>{data.tue}</a>}
                       {this._getEvent(data.tue) !== null && this.renderEvents(data.tue)}
-
-
                     </td>
                     <td style={{ textAlign: 'center', width: '100px' }} >
-                      {data.wed && <a style={{ color: 'black' }} href='#' onClick={() => this.addEvent(data.wed)}>{data.wed}</a>}
+                      {data.wed && <a style={data.wed === today ? { background: '#AED6F1', color: 'black' } : { color: 'black' }} href='#' onClick={() => this.addEvent(data.wed)}>{data.wed}</a>}
                       {this._getEvent(data.wed) !== null && this.renderEvents(data.wed)
                       }
                     </td>
                     <td style={{ textAlign: 'center', width: '100px' }} >
-                      {data.thu && <a style={{ color: 'black' }} href='#' onClick={() => this.addEvent(data.thu)}>{data.thu}</a>}
+                      {data.thu && <a style={data.thu === today ? { background: '#AED6F1', color: 'black' } : { color: 'black' }} href='#' onClick={() => this.addEvent(data.thu)}>{data.thu}</a>}
                       {this._getEvent(data.thu) !== null && this.renderEvents(data.thu)}
                     </td>
                     <td style={{ textAlign: 'center', width: '100px' }} >
-                      {data.fri && <a style={{ color: 'black' }} href='#' onClick={() => this.addEvent(data.fri)}>{data.fri}</a>}
+                      {data.fri && <a style={data.fri === today ? { background: '#AED6F1', color: 'black' } : { color: 'black' }} href='#' onClick={() => this.addEvent(data.fri)}>{data.fri}</a>}
                       {this._getEvent(data.fri) !== null && this.renderEvents(data.fri)}
                     </td>
                     <td style={{ textAlign: 'center', width: '100px' }} >
-                      {data.sat && <a style={{ color: 'black' }} href='#' onClick={() => this.addEvent(data.sat)}>{data.sat}</a>}
+                      {data.sat && <a style={data.sat === today ? { background: '#AED6F1', color: 'black' } : { color: 'black' }} href='#' onClick={() => this.addEvent(data.sat)}>{data.sat}</a>}
                       {this._getEvent(data.sat) !== null && this.renderEvents(data.sat)}
                     </td>
 

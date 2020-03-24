@@ -33,10 +33,9 @@ function list(req, res) {
   query = { // query for getting particular month eventList
     eventDate: {
       $gt: new Date(startDate),
-        $lte: new Date(endDate)
+      $lte: new Date(endDate)
     }
   };
-  console.log(query);
   Event.aggregate([
     { $match: query },
     {
