@@ -25,6 +25,7 @@ function update(req, res) {
     currentEvent.lastUpdatedAt = Date.now();
     currentEvent.save((err, updatedEvent) => {
       if (err) { return res.status(400).send('Error to update Event'); }
+      _alleventList({}, () => { })
       return res.status(200).send(updatedEvent);
     });
   })
@@ -76,6 +77,7 @@ function remove(req, res) {
     currentEvent.deleted = true;
     currentEvent.save((err) => {
       if (err) { return res.status(400).send('Failed to delete Event.'); }
+      _alleventList({}, () => { })
       res.status(200).send('Event Deleted.');
     });
   });

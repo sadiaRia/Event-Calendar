@@ -9,7 +9,6 @@ import Home from "./pages/Home/index.jsx";
 class App extends React.Component {
 	render() {
 		return (
-			// <div><h1>hello world</h1></div>
 				<Router>
 					<Header />
 					<Home/>

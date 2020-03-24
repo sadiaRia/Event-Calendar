@@ -19,7 +19,8 @@ class Home extends Component {
       type: '',
       selectedEventDate: '',
       allEventList: [],
-      selectedEventId: ''
+      selectedEventId: '',
+      errorMessage: ''
     }
     this.getService = new GetService();
   }
@@ -37,7 +38,9 @@ class Home extends Component {
     this.getAllevents(month, year);
     const socket = socketIOClient(this.getService.getHost());
     socket.on("new:Event", (data) => {
-      this.setState({ allEventList: data })
+      if (data) {
+        this.setState({ allEventList: data })
+      }
     });
   }
 
@@ -110,26 +113,30 @@ class Home extends Component {
 
   createEvent = () => {
     const eventId = this.state.selectedEventId;
-    const payload = {
-      title: this.state.title,
-      description: this.state.description,
-      eventDate: this.state.selectedEventDate,
-      eventType: this.state.type
-    }
-    if (eventId) {
-      this.getService
-        .updateEvents(payload, eventId)
-        .then(response => {
-          alert("Event updated");
-          this.resetEverything();
-        })
+    if (this.state.title) {
+      const payload = {
+        title: this.state.title,
+        description: this.state.description,
+        eventDate: this.state.selectedEventDate,
+        eventType: this.state.type
+      }
+      if (eventId) {
+        this.getService
+          .updateEvents(payload, eventId)
+          .then(response => {
+            alert("Event updated");
+            this.resetEverything();
+          })
+      } else {
+        this.getService
+          .createEvent(payload)
+          .then(response => {
+            alert("Event Created");
+            this.resetEverything();
+          })
+      }
     } else {
-      this.getService
-        .createEvent(payload)
-        .then(response => {
-          alert("Event Created");
-          this.resetEverything();
-        })
+      this.setState({ errorMessage: 'please fill out Event Title' })
     }
   }
 
@@ -153,7 +160,8 @@ class Home extends Component {
       description: '',
       eventDate: '',
       type: '',
-      selectedEventId: ''
+      selectedEventId: '',
+      errorMessage: ''
     })
   }
 
@@ -187,16 +195,27 @@ class Home extends Component {
       })
   }
 
+  eventStyle(type) {
+    let styleObj = {
+      Meeting: '#4B0082',
+      Appointment: '#008080',
+      Birthday: '#FF6347',
+      others: '#00008B',
+      Class: '#C71585'
+    }
+    return styleObj[`${type}`];
+  }
+
   renderEvents(data) {
     const list = this._getEvent(data);
     return (list.map((val, index) =>
-      <div style={{ textAlign: 'center' }}><a href='#' onClick={() => this.updateEvent(list, index)}>{val.title}</a></div>
+      <div style={{ textAlign: 'center' }}><a href='#' style={{ color: this.eventStyle(`${val.eventType}`) }} onClick={() => this.updateEvent(list, index)}>{val.title}</a></div>
     ))
   }
 
 
   render() {
-    const { calenderData, selectedMonth, selectedYear, title, type, description, selectedEventDate, showCalender, showForm, selectedEventId, today } = this.state;
+    const { calenderData, selectedMonth, selectedYear, title, type, description, selectedEventDate, showCalender, showForm, selectedEventId, today, errorMessage } = this.state;
     return (
       <div className="container">
         <br />
@@ -269,7 +288,7 @@ class Home extends Component {
             <input disabled={true} type="text" value={selectedEventDate || ''} className="form-control" id="exampleFormControlInput1" />
           </div>
 
-          <div classNames="form-group">
+          <div className="form-group">
             <label for="exampleFormControlInput1">Title</label>
             <input type="text" name="title" value={title || ''} className="form-control" id="exampleFormControlInput1" placeholder="Enter Title" onChange={this.setStateOnFieldChange} />
           </div>
@@ -290,10 +309,10 @@ class Home extends Component {
             <textarea name="description" value={description || ''} className="form-control" id="exampleFormControlTextarea1" rows="3" onChange={this.setStateOnFieldChange}></textarea>
           </div>
           <div>
+            <p style={{ color: 'red' }}>{errorMessage}</p>
             <button onClick={() => this.createEvent()} type="button" className="btn btn-success">Submit</button>&nbsp;&nbsp;
           <button onClick={() => this.hideForm()} type="button" className="btn btn-warning">Cancel</button>&nbsp;&nbsp;
            {selectedEventId && <button type="button" onClick={() => this.removeEvent()} className="btn btn-danger">Delete</button>}
-
           </div>
         </form>}
 
