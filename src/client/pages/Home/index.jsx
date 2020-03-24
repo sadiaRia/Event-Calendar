@@ -34,7 +34,7 @@ class Home extends Component {
       selectedYear: year
     })
     this.getCalender(month, year);
-    this.getAllevents();
+    this.getAllevents(month, year);
   }
 
   setStateOnFieldChange = (event) => {
@@ -64,7 +64,7 @@ class Home extends Component {
       selectedYear: year
     })
     this.getCalender(month, year);
-    this._getEvent(6);
+    this.getAllevents(month, year);
   }
 
   next = () => {
@@ -80,6 +80,7 @@ class Home extends Component {
       selectedYear: year
     })
     this.getCalender(month, year);
+    this.getAllevents(month, year);
   }
 
   addEvent = (date) => {
@@ -120,11 +121,11 @@ class Home extends Component {
 
   resetEverything = () => {
     this.hideForm();
-    this.getAllevents();
+    this.getAllevents(this.state.selectedMonth, this.state.selectedYear);
   }
 
-  getAllevents = () => {
-    this.getService.getAllEvents()
+  getAllevents = (month, year) => {
+    this.getService.getAllEvents(month, year)
       .then(response => {
         this.setState({ allEventList: response.data })
       })
@@ -176,7 +177,7 @@ class Home extends Component {
   renderEvents(data) {
     const list = this._getEvent(data);
     return (list.map((val, index) =>
-      <p><a href='#' onClick={() => this.updateEvent(list, index)}>{val.title}</a></p>
+      <div style={{textAlign: 'center' }}><a href='#' onClick={() => this.updateEvent(list, index)}>{val.title}</a></div>
     ))
   }
 
@@ -185,17 +186,18 @@ class Home extends Component {
     const { calenderData, selectedMonth, selectedYear, title, type, description, selectedEventDate, showCalender, showForm, selectedEventId } = this.state;
     return (
       <div class="container">
+        <br/>
         {showCalender && <div>
           <div style={{ background: '#001a66', color: 'white' }}>
             <ul class="nav justify-content-center">
               <li class="nav-item">
-                <button onClick={() => this.prev()} style={{ fontSize: '26px' }}> {` < `}</button>&nbsp;&nbsp;
+                <a href='#' onClick={() => this.prev()} style={{ fontSize: '26px', color: 'white' }}> {` < `}</a>&nbsp;&nbsp;
            </li>
               <li class="nav-item">
                 <h1 style={{ textAlign: 'center' }}>{months[selectedMonth]} {selectedYear}</h1>
               </li>&nbsp;&nbsp;&nbsp;
           <li class="nav-item">
-                <button onClick={() => this.next()} style={{ fontSize: '26px' }}> {` > `}</button>
+                <a href='#' onClick={() => this.next()} style={{ fontSize: '26px', color: 'white' }}> {` > `}</a>
               </li>
             </ul>
           </div>
@@ -212,18 +214,37 @@ class Home extends Component {
                 {!_.isEmpty(calenderData) && calenderData.map((data) =>
 
                   <tr style={{ height: '200px' }}>
-                    <td style={{ textAlign: 'center' }}>{data.sun}</td>
-                    <td style={{ textAlign: 'center' }}>{data.mon}</td>
-                    <td style={{ textAlign: 'center' }}>{data.tue}</td>
-                    <td style={{ textAlign: 'center' }}>
-                      {data.wed}
-                      <button onClick={() => this.addEvent(data.wed)}>+</button>
+                    <td style={{ textAlign: 'center', width: '100px' }} >
+                      {data.sun && <a style={{ color: 'black' }} href='#' onClick={() => this.addEvent(data.sun)}>{data.sun}</a>}
+                      {this._getEvent(data.sun) !== null && this.renderEvents(data.sun)}
+                    </td>
+                    <td style={{ textAlign: 'center', width: '100px' }} >
+                      {data.mon && <a style={{ color: 'black' }} href='#' onClick={() => this.addEvent(data.mon)}>{data.mon}</a>}
+                      {this._getEvent(data.mon) !== null && this.renderEvents(data.mon)}
+                    </td>
+                    <td style={{ textAlign: 'center', width: '100px' }} >
+                      {data.tue && <a style={{ color: 'black' }} href='#' onClick={() => this.addEvent(data.tue)}>{data.tue}</a>}
+                      {this._getEvent(data.tue) !== null && this.renderEvents(data.tue)}
+
+
+                    </td>
+                    <td style={{ textAlign: 'center', width: '100px' }} >
+                      {data.wed && <a style={{ color: 'black' }} href='#' onClick={() => this.addEvent(data.wed)}>{data.wed}</a>}
                       {this._getEvent(data.wed) !== null && this.renderEvents(data.wed)
                       }
                     </td>
-                    <td style={{ textAlign: 'center' }}>{data.thu}</td>
-                    <td style={{ textAlign: 'center' }}>{data.fri}</td>
-                    <td style={{ textAlign: 'center' }}>{data.sat}</td>
+                    <td style={{ textAlign: 'center', width: '100px' }} >
+                      {data.thu && <a style={{ color: 'black' }} href='#' onClick={() => this.addEvent(data.thu)}>{data.thu}</a>}
+                      {this._getEvent(data.thu) !== null && this.renderEvents(data.thu)}
+                    </td>
+                    <td style={{ textAlign: 'center', width: '100px' }} >
+                      {data.fri && <a style={{ color: 'black' }} href='#' onClick={() => this.addEvent(data.fri)}>{data.fri}</a>}
+                      {this._getEvent(data.fri) !== null && this.renderEvents(data.fri)}
+                    </td>
+                    <td style={{ textAlign: 'center', width: '100px' }} >
+                      {data.sat && <a style={{ color: 'black' }} href='#' onClick={() => this.addEvent(data.sat)}>{data.sat}</a>}
+                      {this._getEvent(data.sat) !== null && this.renderEvents(data.sat)}
+                    </td>
 
                   </tr>)}
               </tbody>
@@ -259,8 +280,8 @@ class Home extends Component {
           </div>
           <div>
             <button onClick={() => this.createEvent()} type="button" class="btn btn-success">Submit</button>&nbsp;&nbsp;
-          <button onClick={() => this.hideForm()} type="button" class="btn btn-warning">Cancel</button>nbsp;&nbsp
-           {selectedEventId && <button type="button" onClick={() => this.removeEvent()} class="btn btn-danger">Danger</button>}
+          <button onClick={() => this.hideForm()} type="button" class="btn btn-warning">Cancel</button>&nbsp;&nbsp;
+           {selectedEventId && <button type="button" onClick={() => this.removeEvent()} class="btn btn-danger">Delete</button>}
 
           </div>
         </form>}

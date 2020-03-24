@@ -14,8 +14,8 @@ export class GetService {
     return axios.post(this.getHost() + `events`, payload)
   }
 
-  getAllEvents() {
-    return axios.get(this.getHost() + `events`)
+  getAllEvents(month, year) {
+    return axios.get(this.getHost() + `events?year=${year}&month=${month}`)
   }
 
   updateEvents(payload, id) {

@@ -1,5 +1,5 @@
 const Event = require('./event'),
- moment = require("moment"),
+  moment = require("moment"),
   _ = require('lodash');
 
 
@@ -25,7 +25,18 @@ function update(req, res) {
 }
 
 function list(req, res) {
-  const query = req.query || {}
+  let query = {};
+  const year = req.query.year,
+    month = req.query.month,
+    startDate = moment([year, month]).toISOString(),
+    endDate = moment(startDate).endOf('month').toISOString();
+  query = { // query for getting particular month eventList
+    eventDate: {
+      $gt: new Date(startDate),
+        $lte: new Date(endDate)
+    }
+  };
+  console.log(query);
   Event.aggregate([
     { $match: query },
     {
